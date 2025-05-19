@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Учет людей</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Шапка -->
+    <header>
+        <h1>Учет людей</h1>
+    </header>
+
+    <!-- Блок ввода -->
+    <section id="inputBlock">
+        <input type="text" id="nameInput" placeholder="Введите имя">
+        <select id="tariffSelect">
+            <option value="30">30 минут</option>
+            <option value="60">1 час</option>
+        </select>
+        <button id="addButton">Добавить</button>
+    </section>
+
+    <!-- Список добавленных людей -->
+    <section id="personListBlock">
+        <ul id="personList"></ul>
+    </section>
+
+    <audio id="alertSound" src="alert.mp3" preload="auto"></audio>
+
+    <!-- Подвал -->
+    <footer>
+        <p>&copy; 2025 Учет людей. Все права защищены.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #e0f7fa; /* Светлый голубой фон */
+}
+
+header {
+    background-color: #00796b; /* Темный голубой цвет */
+    color: white;
+    text-align: center;
+    padding: 15px 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px; /* Фиксированная высота шапки */
+}
+
+#inputBlock {
+    width: 70%; /* Ширина блока */
+    margin: 100px auto 20px; /* Центрирование блока с отступом от шапки (80px + 20px) */
+    background-color: white; /* Белый фон для блока */
+    padding: 20px;
+    border-radius: 8px; /* Скругление углов */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Тень для блока */
+}
+
+#personListBlock {
+    width: 70%; /* Ширина блока */
+    margin: 20px auto; /* Центрирование блока */
+    background-color: white; /* Белый фон для блока */
+    padding: 20px;
+    border-radius: 8px; /* Скругление углов */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Тень для блока */
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    border: 1px solid #ccc;
+    margin: 5px 0;
+}
+
+.expired {
+    color: red;
+}
+
+footer {
+    text-align: center;
+    padding: 10px 0;
+    background-color: #00796b; /* Темный голубой цвет */
+    color: white;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px; /* Фиксированная высота подвала */
+}
