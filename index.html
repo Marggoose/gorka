@@ -7,33 +7,70 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Шапка -->
+    <!-- Шапка с анимацией -->
     <header>
-        <h1>Учет людей</h1>
+        <canvas id="headerCanvas"></canvas>
+        <div class="header-content">
+            <h1>Учет людей</h1>
+        </div>
     </header>
 
-    <!-- Блок ввода -->
-    <section id="inputBlock">
-        <input type="text" id="nameInput" placeholder="Введите имя">
-        <select id="tariffSelect">
-            <option value="30">30 минут</option>
-            <option value="60">1 час</option>
-        </select>
-        <button id="addButton">Добавить</button>
-    </section>
+    <!-- Основной контенер -->
+    <div class="main-container">
+        <!-- Блок ввода с кнопкой фильтра -->
+        <section id="inputBlock">
+            <input type="text" id="nameInput" placeholder="Введите имя">
+            <select id="tariffSelect">
+                <option value="30">30 минут</option>
+                <option value="60">1 час</option>
+                <option value="unlimited">Безлимит</option>
+            </select>
+            <button id="filterToggle" title="Поиск и фильтрация">
+                <span class="filter-indicator">!</span>
+            </button>
+            <button id="addButton">Добавить</button>
+        </section>
 
-    <!-- Список добавленных людей -->
-    <section id="personListBlock">
-        <ul id="personList"></ul>
-    </section>
+        <!-- Блок фильтров (скрыт по умолчанию) -->
+        <section id="filterBlock">
+            <div class="filter-content">
+                <input type="text" id="searchInput" placeholder="Поиск по имени">
+                <select id="filterTariff">
+                    <option value="all">Все тарифы</option>
+                    <option value="30">30 минут</option>
+                    <option value="60">1 час</option>
+                    <option value="unlimited">Безлимит</option>
+                </select>
+                <button id="resetFilters">Сбросить</button>
+            </div>
+        </section>
+
+        <!-- Список добавленных людей -->
+        <section id="personListBlock" class="list-container">
+            <div class="list-header">
+                <h2>Посетители</h2>
+                <span id="personCount" class="list-count">0</span>
+            </div>
+            <div class="list-scrollable">
+                <ul id="personList"></ul>
+                <div id="emptyState" class="empty-list" style="display: none;">
+                    <p>Нет посетителей. Добавьте первого!</p>
+                </div>
+            </div>
+        </section>
+    </div>
 
     <audio id="alertSound" src="alert.mp3" preload="auto"></audio>
 
-    <!-- Подвал -->
+    <!-- Подвал с анимацией -->
     <footer>
-        <p>&copy; 2025 Учет людей. Все права защищены.</p>
+        <canvas id="footerCanvas"></canvas>
+        <div class="footer-content">
+            <p>&copy; 2025 Учет людей. Все права защищены.</p>
+        </div>
     </footer>
 
     <script src="script.js"></script>
+    <script src="animation.js"></script>
 </body>
 </html>
