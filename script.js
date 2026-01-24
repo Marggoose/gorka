@@ -111,8 +111,8 @@ function startTimer(timerElement, duration, listItem) {
 
             timerElement.textContent = formatTime(timeRemaining);
 
-            // 🔴 За 10 минут
-            if (timeRemaining <= 600) {
+            // 🔴 За 2 минуты (было 10 минут)
+            if (timeRemaining <= 120) {
                 listItem.classList.add('warning');
                 timerElement.classList.add('warning');
             }
