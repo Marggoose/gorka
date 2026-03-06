@@ -141,28 +141,20 @@ function sortList() {
     // Если элементов меньше 2, сортировка не нужна
     if (items.length < 2) return;
     
-    // Сортировка: просроченные сверху, затем предупреждение, затем по времени, безлимит внизу
+    // Сортировка: по времени (от меньшего к большему), безлимит внизу
     items.sort((a, b) => {
-        // Просроченные вверх
-        if (a.classList.contains('expired') && !b.classList.contains('expired')) return -1;
-        if (!a.classList.contains('expired') && b.classList.contains('expired')) return 1;
-        
-        // Предупреждение вторые
-        if (a.classList.contains('warning') && !b.classList.contains('warning')) return -1;
-        if (!a.classList.contains('warning') && b.classList.contains('warning')) return 1;
-        
         // Безлимит всегда внизу
         if (a.classList.contains('unlimited') && !b.classList.contains('unlimited')) return 1;
         if (!a.classList.contains('unlimited') && b.classList.contains('unlimited')) return -1;
         
-        // Если оба с таймером - сортируем по времени (меньше времени - выше)
-        if (!a.classList.contains('unlimited') && !b.classList.contains('unlimited')) {
-            const timeA = parseInt(a.querySelector('.timer').dataset.time || 0);
-            const timeB = parseInt(b.querySelector('.timer').dataset.time || 0);
-            return timeA - timeB;
-        }
+        // Если оба безлимита - они равны
+        if (a.classList.contains('unlimited') && b.classList.contains('unlimited')) return 0;
         
-        return 0;
+        // Если оба с таймером - сортируем по времени (меньше времени - выше)
+        const timeA = parseInt(a.querySelector('.timer').dataset.time || 0);
+        const timeB = parseInt(b.querySelector('.timer').dataset.time || 0);
+        
+        return timeA - timeB;
     });
     
     // Оптимизированное обновление DOM - только измененные позиции
