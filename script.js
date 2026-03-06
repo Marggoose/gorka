@@ -74,6 +74,9 @@ function addPerson() {
     updateEmptyState();
     updatePersonCount();
     applyFilters();
+    
+    // Сортируем после добавления
+    sortList();
 }
 
 function formatTime(seconds) {
@@ -99,6 +102,9 @@ function startTimer(timerElement, duration, listItem) {
                 playAlert();
                 alertPlaying = true;
             }
+            
+            // Сортируем при истечении времени
+            sortList();
         } else {
             timeRemaining--;
             timerElement.dataset.time = timeRemaining;
@@ -109,8 +115,8 @@ function startTimer(timerElement, duration, listItem) {
                 listItem.classList.add('warning');
                 timerElement.classList.add('warning');
             }
-
-            sortList();
+            
+            // НЕ вызываем сортировку здесь!
         }
     }, 1000);
 
@@ -127,13 +133,207 @@ function startTimer(timerElement, duration, listItem) {
     });
 }
 
-/* остальной код без изменений */
+// ЕДИНСТВЕННАЯ функция сортировки (оптимизированная)
+function sortList() {
+    const list = document.getElementById('personList');
+    const items = Array.from(list.children);
+    
+    // Если элементов меньше 2, сортировка не нужна
+    if (items.length < 2) return;
+    
+    // Сортировка: просроченные сверху, затем предупреждение, затем по времени, безлимит внизу
+    items.sort((a, b) => {
+        // Просроченные вверх
+        if (a.classList.contains('expired') && !b.classList.contains('expired')) return -1;
+        if (!a.classList.contains('expired') && b.classList.contains('expired')) return 1;
+        
+        // Предупреждение вторые
+        if (a.classList.contains('warning') && !b.classList.contains('warning')) return -1;
+        if (!a.classList.contains('warning') && b.classList.contains('warning')) return 1;
+        
+        // Безлимит всегда внизу
+        if (a.classList.contains('unlimited') && !b.classList.contains('unlimited')) return 1;
+        if (!a.classList.contains('unlimited') && b.classList.contains('unlimited')) return -1;
+        
+        // Если оба с таймером - сортируем по времени (меньше времени - выше)
+        if (!a.classList.contains('unlimited') && !b.classList.contains('unlimited')) {
+            const timeA = parseInt(a.querySelector('.timer').dataset.time || 0);
+            const timeB = parseInt(b.querySelector('.timer').dataset.time || 0);
+            return timeA - timeB;
+        }
+        
+        return 0;
+    });
+    
+    // Оптимизированное обновление DOM - только измененные позиции
+    for (let i = 0; i < items.length; i++) {
+        if (list.children[i] !== items[i]) {
+            // Вставляем элемент на правильную позицию
+            list.insertBefore(items[i], list.children[i]);
+        }
+    }
+}
 
+function enterConfirmDeleteMode(stopButton, container, listItem) {
+    confirmDeleteMode = true;
+    
+    // Сохраняем оригинальную кнопку
+    stopButton.style.display = 'none';
+    
+    // Создаем кнопки подтверждения
+    const confirmBtn = document.createElement('button');
+    confirmBtn.className = 'stopButton confirm-button';
+    confirmBtn.title = 'Подтвердить удаление';
+    
+    const cancelBtn = document.createElement('button');
+    cancelBtn.className = 'stopButton cancel-button';
+    cancelBtn.title = 'Отмена';
+    
+    container.appendChild(confirmBtn);
+    container.appendChild(cancelBtn);
+    
+    // Обработчики
+    confirmBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        deletePerson(listItem);
+    });
+    
+    cancelBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        exitConfirmDeleteMode(container, stopButton);
+    });
+    
+    // Автоматический выход через 5 секунд
+    setTimeout(() => {
+        if (confirmDeleteMode && container.contains(confirmBtn)) {
+            exitConfirmDeleteMode(container, stopButton);
+        }
+    }, 5000);
+}
+
+function exitConfirmDeleteMode(container, stopButton) {
+    confirmDeleteMode = false;
+    
+    // Удаляем все кнопки кроме оригинальной
+    const buttons = container.querySelectorAll('.stopButton');
+    buttons.forEach(btn => {
+        if (btn !== stopButton) btn.remove();
+    });
+    
+    stopButton.style.display = 'flex';
+}
+
+function deletePerson(listItem) {
+    // Останавливаем таймер если есть
+    if (timers.has(listItem)) {
+        clearInterval(timers.get(listItem).interval);
+        timers.delete(listItem);
+    }
+    
+    // Удаляем элемент
+    listItem.remove();
+    
+    confirmDeleteMode = false;
+    updateEmptyState();
+    updatePersonCount();
+    
+    // Сортируем после удаления
+    sortList();
+}
+
+function toggleFilterBlock() {
+    const filterBlock = document.getElementById('filterBlock');
+    const filterToggle = document.getElementById('filterToggle');
+    
+    filterVisible = !filterVisible;
+    
+    if (filterVisible) {
+        filterBlock.classList.add('active');
+        filterToggle.classList.add('active');
+    } else {
+        filterBlock.classList.remove('active');
+        filterToggle.classList.remove('active');
+    }
+}
+
+function applyFilters() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+    const tariffFilter = document.getElementById('filterTariff').value;
+    
+    activeFilters.search = searchTerm;
+    activeFilters.tariff = tariffFilter;
+    
+    const items = document.querySelectorAll('#personList li');
+    let visibleCount = 0;
+    
+    items.forEach(item => {
+        const name = item.querySelector('.name').textContent.toLowerCase();
+        const tariff = item.dataset.tariff;
+        
+        const matchesSearch = name.includes(searchTerm);
+        const matchesTariff = tariffFilter === 'all' || tariff === tariffFilter;
+        
+        if (matchesSearch && matchesTariff) {
+            item.style.display = 'flex';
+            visibleCount++;
+        } else {
+            item.style.display = 'none';
+        }
+    });
+    
+    // Обновляем счетчик видимых элементов
+    document.getElementById('personCount').textContent = visibleCount;
+    updateFilterIndicator();
+}
+
+function resetFilters() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('filterTariff').value = 'all';
+    applyFilters();
+}
+
+function playAlert() {
+    const audio = document.getElementById('alertSound');
+    if (audio) {
+        audio.play().catch(e => console.log('Audio play failed:', e));
+    }
+}
+
+function updateEmptyState() {
+    const list = document.getElementById('personList');
+    const emptyState = document.getElementById('emptyState');
+    
+    if (list.children.length === 0) {
+        emptyState.style.display = 'block';
+    } else {
+        emptyState.style.display = 'none';
+    }
+}
+
+function updatePersonCount() {
+    const count = document.querySelectorAll('#personList li').length;
+    document.getElementById('personCount').textContent = count;
+    updateEmptyState();
+}
+
+function updateFilterIndicator() {
+    const indicator = document.querySelector('.filter-indicator');
+    const hasActiveFilters = activeFilters.search !== '' || activeFilters.tariff !== 'all';
+    
+    if (hasActiveFilters) {
+        indicator.style.display = 'flex';
+    } else {
+        indicator.style.display = 'none';
+    }
+}
+
+// Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', function() {
     updateEmptyState();
     updatePersonCount();
     updateFilterIndicator();
 
+    // Очистка таймеров при уходе со страницы
     window.addEventListener('beforeunload', function() {
         timers.forEach(timerData => clearInterval(timerData.interval));
         timers.clear();
